@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decryption Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Decrypt Code</h1>
+        <form id="decryptForm">
+            <input type="text" id="inputCode" placeholder="Enter encrypted code" required>
+            <input type="text" id="keyword" placeholder="Enter keyword" required>
+            <button type="submit">Decrypt</button>
+        </form>
+        <p id="result" style="font-size: 18px; color: green;"></p>
+        <p id="error" style="font-size: 18px; color: red;"></p>
+    </div>
+
+    <script>
+        document.getElementById('decryptForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const inputCode = document.getElementById('inputCode').value;
+            const keyword = document.getElementById('keyword').value;
+
+            const resultElement = document.getElementById('result');
+            const errorElement = document.getElementById('error');
+
+            resultElement.textContent = '';
+            errorElement.textContent = '';
+
+            try {
+                const response = await fetch('/api/decrypt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ input_code: inputCode, keyword: keyword }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultElement.textContent = `Decrypted Code: ${data.decrypted_code}`;
+                } else {
+                    errorElement.textContent = data.error || 'An error occurred.';
+                }
+            } catch (error) {
+                errorElement.textContent = 'Failed to connect to the server.';
+            }
+        });
+    </script>
+</body>
+</html>
